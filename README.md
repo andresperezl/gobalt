@@ -1,5 +1,7 @@
 # Gobalt
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/andresperezl/gobalt.svg)](https://pkg.go.dev/github.com/andresperezl/gobalt)
+
 Go library to interact with [cobalt.tools API](https://cobalt.tools/)
 
 ## Support cobalt.tools

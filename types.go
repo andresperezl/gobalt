@@ -18,6 +18,7 @@ type Request struct {
 	AudioFormat AudioFormat `json:"aFormat,omitempty"`
 
 	// FilenamePattern changes the way files are named.
+	// Some services don't support rich file names and always use the classic style.
 	// Default FilenamePatternClassic
 	FilenamePattern FilenamePattern `json:"filenamePattern,omitempty"`
 
@@ -58,7 +59,7 @@ const (
 	VideoCodecH264 VideoCodec = "h264"
 	// VideoCodecAV1 best quality, small file size, most detail. Supports 8k and HDR.
 	VideoCodecAV1 VideoCodec = "av1"
-	// VIdeoCodecVP9 same quality as av1, but file size is 2x larger. Supports 4k and HDR.
+	// VideoCodecVP9 same quality as av1, but file size is 2x larger. Supports 4k and HDR.
 	VideoCodecVP9 VideoCodec = "vp9"
 )
 
@@ -94,8 +95,98 @@ const (
 type FilenamePattern string
 
 const (
+	// FilenamePatternClassic default cobalt file name pattern.
+	//
+	// Video: youtube_dQw4w9WgXcQ_2560x1440_h264.mp4
+	//
+	// Audio: youtube_dQw4w9WgXcQ_audio.mp3
 	FilenamePatternClassic FilenamePattern = "classic"
-	FilenamePatternPretty  FilenamePattern = "pretty"
-	FilenamePatternBasic   FilenamePattern = "basic"
-	FilenamePatternNerdy   FilenamePattern = "nerdy"
+
+	// FilenamePatternPretty title and info in brackets.
+	//
+	// Video: Video Title (1440p, h264, youtube).mp4
+	//
+	// Audio: Audio Title - Audio Author (soundcloud).mp3
+	FilenamePatternPretty FilenamePattern = "pretty"
+
+	// FilenamePatternBasic title and basic info in brackets.
+	//
+	// Video: Video Title (1440p, h264).mp4
+	//
+	// Audio: Audio Title - Audio Author.mp3
+	FilenamePatternBasic FilenamePattern = "basic"
+
+	// FilenamePatternNerdy title and full info in brackets.
+	//
+	// Video: Video Title (1440p, h264, youtube, dQw4w9WgXcQ).mp4
+	//
+	// Audio: Audio Title - Audio Author (soundcloud, 1242868615).mp3
+	FilenamePatternNerdy FilenamePattern = "nerdy"
 )
+
+type Response struct {
+	// Status is the type of response from the API
+	Status ResponseStatus `json:"status"`
+	// Text is mostly used for errors
+	Text string `json:"text,omitempty"`
+	// URL direct link to a file or a link to cobalt's live render
+	URL string `json:"url,omitempty"`
+	// PickerType used when ResponseStatusPicker
+	PickerType PickerType `json:"pickerType,omitempty"`
+	// Picker array of PickerItem
+	Picker []PickerItem `json:"picker,omitempty"`
+	// Audio direct link to a file or a link to cobalt's live render
+	Audio string `json:"audio,omitempty"`
+}
+
+type ResponseStatus string
+
+const (
+	ResponseStatusError     ResponseStatus = "error"
+	ResponseStatusRedirect  ResponseStatus = "redirect"
+	ResponseStatusStream    ResponseStatus = "stream"
+	ResponseStatusSuccess   ResponseStatus = "success"
+	ResponseStatusRateLimit ResponseStatus = "rate-limit"
+	ResponseStatusPicker    ResponseStatus = "picker"
+)
+
+type PickerType string
+
+const (
+	PickerTypeVarious PickerType = "various"
+	PickerTypeImages  PickerType = "images"
+)
+
+type PickerItem struct {
+	// Type used only when parent PickerType is PickerTypeVarious
+	Type PickerItemType `json:"type,omitempty"`
+	// URL direct link to a file or a link to cobalt's live render
+	URL string `json:"url"`
+	// Thumb item thumbnail that is displayed in the picker
+	Thumb string `json:"thumb"`
+}
+
+type PickerItemType string
+
+const (
+	PickerItemTypeVideo PickerItemType = "video"
+	PickerItemTypePhoto PickerItemType = "photo"
+	PickerItemTypeGIF   PickerItemType = "gif"
+)
+
+type ServerInfo struct {
+	// Version Cobalt version
+	Version string `json:"version"`
+	// Commit Git commit
+	Commit string `json:"commit"`
+	// Branch Git Branch
+	Branch string `json:"branch"`
+	// Name server name
+	Name string `json:"name"`
+	// URL server URL
+	URL string `json:"url"`
+	// CORS status of CORS
+	CORS string `json:"cors"`
+	// StartTime server start time
+	StartTime string `json:"startTime"`
+}

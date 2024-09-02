@@ -1,5 +1,7 @@
 package gobalt
 
+import "net/http"
+
 type Request struct {
 	// URL must be included in every request
 	URL string `json:"url"`
@@ -124,7 +126,10 @@ const (
 	FilenamePatternNerdy FilenamePattern = "nerdy"
 )
 
-type Response struct {
+type Media struct {
+	client   *http.Client
+	filename string
+
 	// Status is the type of response from the API
 	Status ResponseStatus `json:"status"`
 	// Text is mostly used for errors

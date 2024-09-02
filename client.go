@@ -6,7 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"net/url"
+	"path"
 )
 
 const (
@@ -42,7 +45,7 @@ func (c *Cobalt) WithHTTPClient(client *http.Client) *Cobalt {
 }
 
 // Get will return a Response from where the file can be downloaded
-func (c *Cobalt) Get(ctx context.Context, params Request) (*Response, error) {
+func (c *Cobalt) Get(ctx context.Context, params Request) (*Media, error) {
 	buff := &bytes.Buffer{}
 	if err := json.NewEncoder(buff).Encode(params); err != nil {
 		return nil, err
@@ -63,23 +66,54 @@ func (c *Cobalt) Get(ctx context.Context, params Request) (*Response, error) {
 	}
 	defer resp.Body.Close()
 
-	response := &Response{}
-	if err := json.NewDecoder(resp.Body).Decode(response); err != nil {
+	media := &Media{client: c.client}
+	if err := json.NewDecoder(resp.Body).Decode(media); err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	if err := media.parseFilename(resp); err != nil {
+		return nil, fmt.Errorf("error extracting media filename: %w", err)
+	}
+
+	return media, nil
 }
 
-// Stream is a helper utility that will return an io.ReadCloser using the URL returned from Get()
+func (m *Media) parseFilename(resp *http.Response) error {
+	if m.Status == ResponseStatusError || m.Status == ResponseStatusRateLimit {
+		return nil
+	}
+
+	for _, cd := range resp.Header.Values("Content-Disposition") {
+		_, params, err := mime.ParseMediaType(cd)
+		if err != nil {
+			return err
+		}
+		if filename, ok := params["filename"]; ok {
+			m.filename = filename
+			return nil
+		}
+	}
+	parsedURL, err := url.Parse(m.URL)
+	if err != nil {
+		return err
+	}
+	m.filename = path.Base(parsedURL.Path)
+	return nil
+}
+
+func (m *Media) Filename() string {
+	return m.filename
+}
+
+// Stream is a helper utility that will return an io.ReadCloser using the URL from this media object
 // The returned io.ReadCloser is the Body of *http.Response and must be closed when you are done with the stream.
-func (c *Cobalt) Stream(ctx context.Context, url string) (io.ReadCloser, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+func (m *Media) Stream(ctx context.Context) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, m.URL, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := m.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

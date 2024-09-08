@@ -51,8 +51,8 @@ func (c *Cobalt) Get(ctx context.Context, params Request) (*Media, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s%s", c.apiBaseURL, EndpointJSON)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, buff)
+	u := fmt.Sprintf("%s%s", c.apiBaseURL, EndpointJSON)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, buff)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +69,10 @@ func (c *Cobalt) Get(ctx context.Context, params Request) (*Media, error) {
 	media := &Media{client: c.client}
 	if err := json.NewDecoder(resp.Body).Decode(media); err != nil {
 		return nil, err
+	}
+
+	if media.Status == ResponseStatusError {
+		return nil, CobaltAPIError(*media)
 	}
 
 	return media, nil
@@ -138,4 +142,11 @@ func (m *Media) Stream(ctx context.Context) (io.ReadCloser, error) {
 	}
 
 	return resp.Body, nil
+}
+
+// CobalAPIError is just a convenient type to convert Media into an error.
+type CobaltAPIError Media
+
+func (err CobaltAPIError) Error() string {
+	return err.Text
 }

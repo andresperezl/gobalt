@@ -27,7 +27,7 @@ func (c *Cobalt) WithHTTPClient(client *http.Client) *Cobalt {
 	return c
 }
 
-// Post will return a PostResponse from where the file can be downloaded
+// Post will return a [PostResponse] from where the file can be downloaded
 // headers are passed as key value pairs. Examples `"API-KEY", "MyApiKey"`
 func (c *Cobalt) Post(ctx context.Context, params PostRequest, headers ...string) (*PostResponse, error) {
 	buff := &bytes.Buffer{}
@@ -69,9 +69,9 @@ func (c *Cobalt) Post(ctx context.Context, params PostRequest, headers ...string
 	return media, nil
 }
 
-// Stream is a helper utility that will return an io.ReadCloser using the URL from this media object
-// The returned io.ReadCloser is the Body of *http.Response and must be closed when you are done with the stream.
-// When the m.Status == ResponseStatusPicker it will stream the first item from the m.Picker array.
+// Stream is a helper utility that will return an [io.ReadCloser] using the [PostResponse.URL] from this media object
+// The returned [io.ReadCloser] is the Body of [*http.Response] and must be closed when you are done with the stream.
+// When the [PostResponse.Status] == [ResponseStatusPicker] it will stream the first item from the [PostResponse.Picker] array.
 func (m *PostResponse) Stream(ctx context.Context) (io.ReadCloser, error) {
 	if m.Status != ResponseStatusTunnel && m.Status != ResponseStatusRedirect && m.Status != ResponseStatusPicker {
 		return nil, fmt.Errorf("unstreamable response type %s", m.Status)
@@ -168,7 +168,7 @@ func (c *Cobalt) Session(ctx context.Context, headers ...string) (*SessionRespon
 	return token, nil
 }
 
-// CobalAPIError is just a convenient type to convert Media into an error.
+// CobalAPIError is just a convenient type to convert [PostResponse] into an error.
 type CobaltAPIError PostResponse
 
 func (err CobaltAPIError) Error() string {

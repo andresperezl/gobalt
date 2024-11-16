@@ -7,29 +7,29 @@ type PostRequest struct {
 	URL string `json:"url"`
 
 	// VideoQuality if the selected quality isn't available, closest one is used instead.
-	// Default VideoQuality1080p
+	// Default [VideoQuality1080p]
 	VideoQuality VideoQuality `json:"videoQuality,omitempty"`
 
 	// AudioFormat Format to re-encode audio into. If AudioFormatBest is selected, you get the audio the way it is on service's side.
-	// Default AudioFormatMP3
+	// Default [AudioFormatMP3]
 	AudioFormat AudioFormat `json:"audioFormat,omitempty"`
 
 	// AudioBitrate Specifies the birate to use for the audio. Applies only to audio conversion.
-	// Default AudioBitrate128
+	// Default [AudioBitrate128]
 	AudioBitrate AudioBitrate `json:"audioBitrate,omitempty"`
 
 	// FilenameStyle changes the way files are named.
 	// Some services don't support rich file names and always use the classic style.
-	// Default FilenamePatternClassic
+	// Default [FilenamePatternClassic]
 	FilenameStyle FilenameStyle `json:"filenameStyle,omitempty"`
 
 	// DownloadMode selects if to download only the audio, or mute the audio in video tracks
-	// Default auto
+	// Default [DownloadModeAuto]
 	DownloadMode DownloadMode `json:"downloadMode,omitempty"`
 
 	// YoutubeVideoCodec applies only for Youtube downloads.
-	// Pick YoutubeVideoCodecH264 if you want best compatibility. Pick YoutubeVideoCodecAV1 if you want best quality and efficiency.
-	// Default YoutubeVideoCodecH264
+	// Pick [YoutubeVideoCodecH264] if you want best compatibility. Pick [YoutubeVideoCodecAV1] if you want best quality and efficiency.
+	// Default [YoutubeVideoCodecH264]
 	YoutubeVideoCodec YoutubeVideoCodec `json:"youtubeVideoCodec,omitempty"`
 
 	// YoutubeDubLang Specifies the language of audio to download when a youtube video is dubbed.
@@ -65,11 +65,11 @@ type PostRequest struct {
 type YoutubeVideoCodec string
 
 const (
-	// YoutubeVideoCodecH264 best support across apps/platforms, average detail level. Max VideoQuality is VideoQuality1080p
+	// YoutubeVideoCodecH264 best support across apps/platforms, average detail level. Max VideoQuality is [VideoQuality1080p]
 	YoutubeVideoCodecH264 YoutubeVideoCodec = "h264"
-	// YoutubeVideoCodecAV1 best quality, small file size, most detail. Supports 8k and HDR.
+	// YoutubeVideoCodecAV1 best quality, small file size, most detail. Supports [VideoQuality8k] and HDR.
 	YoutubeVideoCodecAV1 YoutubeVideoCodec = "av1"
-	// YoutubeVideoCodecVP9 same quality as av1, but file size is 2x larger. Supports 4k and HDR.
+	// YoutubeVideoCodecVP9 same quality as av1, but file size is 2x larger. Supports [VideoQuality4k] and HDR.
 	YoutubeVideoCodecVP9 YoutubeVideoCodec = "vp9"
 )
 
@@ -87,10 +87,10 @@ const (
 	VideoQuality4320p VideoQuality = "4320"
 	VideoQualityMax   VideoQuality = "max"
 
-	// VideoQuality4k is an alias for VideoQuality2160p
+	// VideoQuality4k is an alias for [VideoQuality2160p]
 	VideoQuality4K VideoQuality = VideoQuality2160p
 
-	// VideoQuality8k is an alias for VideoQuality4320p
+	// VideoQuality8k is an alias for [VideoQuality4320p]
 	VideoQuality8K VideoQuality = VideoQuality4320p
 )
 
@@ -183,14 +183,14 @@ type PostResponse struct {
 	// Status is the type of response from the API
 	Status ResponseStatus `json:"status"`
 
-	// ResponseStatusTunnel and ResponseStatusRedirect fields
+	// [ResponseStatusTunnel] and [ResponseStatusRedirect] fields
 
 	// URL for the cobalt tunnel, or redirect to an external link
 	URL string `json:"url,omitempty"`
 	// Filename cobalt-generated filename for the file being downloaded
 	Filename string `json:"filename,omitempty"`
 
-	// ResponseStatusPicker fields
+	// [ResponseStatusPicker] fields
 
 	// Audio returned when an image slideshow (such as tiktok) has a general background audio
 	Audio string `json:"audio,omitempty"`
@@ -199,7 +199,7 @@ type PostResponse struct {
 	// Picker array of objects containing the individual media
 	Picker []PickerItem `json:"picker,omitempty"`
 
-	// ResponseStatusError fields
+	// [ResponseStatusError] fields
 
 	// ErrorInfo contains more context about the error
 	ErrorInfo ResponseErrorInfo `json:"error,omitempty"`

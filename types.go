@@ -8,7 +8,7 @@ type PostRequest struct {
 
 	// VideoQuality if the selected quality isn't available, closest one is used instead.
 	// Default VideoQuality1080p
-	VideoQuality VideoQuality `json:"vQuality,omitempty"`
+	VideoQuality VideoQuality `json:"videoQuality,omitempty"`
 
 	// AudioFormat Format to re-encode audio into. If AudioFormatBest is selected, you get the audio the way it is on service's side.
 	// Default AudioFormatMP3

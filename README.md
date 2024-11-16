@@ -1,8 +1,8 @@
 # Gobalt
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/andresperezl/gobalt.svg)](https://pkg.go.dev/github.com/andresperezl/gobalt)
+[![Go Reference](https://pkg.go.dev/badge/github.com/andresperezl/gobalt/v2.svg)](https://pkg.go.dev/github.com/andresperezl/gobalt/v2)
 
-Go library to interact with [cobalt.tools API](https://cobalt.tools/)
+[cobalt.tools API](https://cobalt.tools/) API client GO library.
 
 ## Usage
 

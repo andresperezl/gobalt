@@ -206,6 +206,8 @@ type PostResponse struct {
 }
 
 type PickerItem struct {
+	client *http.Client
+
 	Type  PickerItemType `json:"type"`
 	URL   string         `json:"url"`
 	Thumb string         `json:"thumb"`

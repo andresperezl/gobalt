@@ -66,12 +66,17 @@ func (c *Cobalt) Post(ctx context.Context, params PostRequest, headers ...string
 		return nil, CobaltAPIError(*media)
 	}
 
+	for i := range media.Picker {
+		media.Picker[i].client = c.client
+	}
+
 	return media, nil
 }
 
 // Stream is a helper utility that will return an [io.ReadCloser] using the [PostResponse.URL] from this media object
 // The returned [io.ReadCloser] is the Body of [*http.Response] and must be closed when you are done with the stream.
 // When the [PostResponse.Status] == [ResponseStatusPicker] it will stream the first item from the [PostResponse.Picker] array.
+// Use [PickerItem.Stream] instead to stream an specific item from the picker list.
 func (m *PostResponse) Stream(ctx context.Context) (io.ReadCloser, error) {
 	if m.Status != ResponseStatusTunnel && m.Status != ResponseStatusRedirect && m.Status != ResponseStatusPicker {
 		return nil, fmt.Errorf("unstreamable response type %s", m.Status)
@@ -80,6 +85,19 @@ func (m *PostResponse) Stream(ctx context.Context) (io.ReadCloser, error) {
 	url := m.URL
 	if m.Status == ResponseStatusPicker && len(m.Picker) > 0 {
 		url = m.Picker[0].URL
+	}
+	return stream(ctx, m.client, url)
+}
+
+// Stream is a helper utility that will return an [io.ReadCloser] using the [PickerItem.URL] from this media object
+// The returned [io.ReadCloser] is the Body of [*http.Response] and must be closed when you are done with the stream.
+func (m PickerItem) Stream(ctx context.Context) (io.ReadCloser, error) {
+	return stream(ctx, m.client, m.URL)
+}
+
+func stream(ctx context.Context, client *http.Client, url string) (io.ReadCloser, error) {
+	if client == nil {
+		client = http.DefaultClient
 	}
 	if len(url) == 0 {
 		return nil, fmt.Errorf("url is empty, nothing to stream")
@@ -90,7 +108,7 @@ func (m *PostResponse) Stream(ctx context.Context) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	resp, err := m.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
